@@ -13,7 +13,7 @@ def z_score_normalized_features(x):
 def z_score_denormalized_features(x,normalized_x):
     mu = np.mean(x)
     sigma = np.std(x)
-    return (normalized_x * sigma) / mu
+    return (normalized_x * sigma) + mu
 
 def predict(x,w,b):
     return w * x + b
