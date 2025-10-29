@@ -1,17 +1,19 @@
-import sklearn.linear_model
 import numpy as np
-import csv
 import math
-import sklearn
 
 def load_data():
-    data = np.genfromtxt('single_feature_housing.csv', delimiter=',', skip_header=1)
-    return data[:,0] , data[:,1]  
+    data = np.genfromtxt('salary.csv', delimiter=',', skip_header=1)
+    return data[:,0] , data[:,1]
 
 def z_score_normalized_features(x):
     mu = np.mean(x)
     sigma = np.std(x)
     return (x - mu) / sigma
+
+def z_score_denormalized_features(x,normalized_x):
+    mu = np.mean(x)
+    sigma = np.std(x)
+    return (normalized_x * sigma) / mu
 
 def predict(x,w,b):
     return w * x + b
@@ -45,6 +47,7 @@ def find_gradient_derivatives(x,y,w,b):
 
 def calculate_gradient_descent(x_in,y_in,w,b,alpha=0.001,iterations=1000):
     w_histort = []
+    w_history = []
     cost_history = []
 
     for i in range(iterations):
@@ -55,35 +58,22 @@ def calculate_gradient_descent(x_in,y_in,w,b,alpha=0.001,iterations=1000):
     
         if i <100000:
             cost_history.append(calculate_cost(x_in,y_in,w,b))
+            w_history.append(w)
         
         if i% math.ceil(iterations/10)==0:
             w_histort.append(w)
-            print(f"Iterations : {i} Cost : {cost_history[-1]}")
+            print(f"Iterations : {i} Cost : {cost_history[-1]:0.2e}")
 
         if i==iterations-1:
             w_histort.append(w)
-            print(f"Iterations : {i+1} Cost : {cost_history[-1]}")
+            print(f"Iterations : {i+1} Cost : {cost_history[-1]:0.2e}")
 
-    return w,b
+    return w,b,w_history,cost_history
 
-x,y = load_data()
+def compute_model_output(x,w,b):
+    m = x.shape[0]
+    f_wb = np.zeros(m)
+    for i in range(m):
+        f_wb[i] = (x[i] * w) + b
 
-# x = z_score_normalized_features(x)
-
-initial_w = 0.
-initial_b = 0.
-
-w,b = calculate_gradient_descent(x,y,initial_w,initial_b,alpha=0.001,iterations=1000)
-print(f"Calculated w : {w} , b : {b}")
-
-age = 41
-predict_price = predict(age,w,b)
-print(f"Age : {age}, Predicted price {predict_price}")
-
-
-print("--------------")
-print("Predict using scikit learn")
-ln_reg = sklearn.linear_model.SGDRegressor(max_iter=1000)
-ln_reg.fit(x.reshape(-1,1),y)
-print(f"Calculated w : {ln_reg.intercept_} , b : {ln_reg.coef_}")
-print(f"Age : {age}, Predicted price {ln_reg.predict([[age]])}")
+    return f_wb
