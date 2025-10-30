@@ -57,8 +57,8 @@ def find_gradient_derivatives(x,y,w,b):
     return dj_dw,dj_db
 
 def calculate_gradient_descent(x_in,y_in,w,b,alpha=0.001,iterations=1000):
-    w_histort = []
     w_history = []
+    b_history = []
     cost_history = []
 
     for i in range(iterations):
@@ -70,13 +70,12 @@ def calculate_gradient_descent(x_in,y_in,w,b,alpha=0.001,iterations=1000):
         if i <100000:
             cost_history.append(calculate_cost(x_in,y_in,w,b))
             w_history.append(w)
-        
+            b_history.append(b)
+
         if i% math.ceil(iterations/10)==0:
-            w_histort.append(w)
             print(f"Iterations : {i} Cost : {cost_history[-1]:0.2e}")
 
         if i==iterations-1:
-            w_histort.append(w)
             print(f"Iterations : {i+1} Cost : {cost_history[-1]:0.2e}")
 
-    return w,b,w_history,cost_history
+    return w,b,w_history,b_history,cost_history
