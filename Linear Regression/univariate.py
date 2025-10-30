@@ -1,9 +1,20 @@
 import numpy as np
 import math
 
-def load_data():
+def load_data(training_data=float):
     data = np.genfromtxt('salary.csv', delimiter=',', skip_header=1)
-    return data[:,0] , data[:,1]
+
+    # Shuffle the data randomly
+    np.random.seed(42)  # for reproducibility (optional)
+    np.random.shuffle(data)
+    
+    split = int(len(data) * training_data)
+    train_x = data[:split,0]
+    train_y = data[:split,1]
+
+    test_x = data[split:,0]
+    test_y = data[split:,1]
+    return train_x,train_y,test_x,test_y
 
 def z_score_normalized_features(x):
     mu = np.mean(x)
@@ -69,11 +80,3 @@ def calculate_gradient_descent(x_in,y_in,w,b,alpha=0.001,iterations=1000):
             print(f"Iterations : {i+1} Cost : {cost_history[-1]:0.2e}")
 
     return w,b,w_history,cost_history
-
-def compute_model_output(x,w,b):
-    m = x.shape[0]
-    f_wb = np.zeros(m)
-    for i in range(m):
-        f_wb[i] = (x[i] * w) + b
-
-    return f_wb
